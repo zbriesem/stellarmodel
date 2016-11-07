@@ -3,7 +3,9 @@
 After cloning the repository somewhere into your PYTHONPATH:
 
 Open setup/setup.py
+
 Change home_dir function to the location of ~/stellarmodel/
+
 Save and close
 
 
