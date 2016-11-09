@@ -23,15 +23,17 @@ class OpacityTable:
         log_R:    log10(rho / T6**3)
         log_T:    log10(T)
         log_k:    log10(k), where k are Rosseland mean opacities in cm^2/g
+
+        Functions:
+
+        Rosseland_mean_opacity(rho, T)    :    returns interpolated value for any rho, T on opacity table
         """
         with open(fname, 'r') as file:
             self.lines = file.readlines()
         self.X = X
         self.Y = Y
         self.Z = Z
-        if self.X + self.Y + self.Z != 1:
-            print("Mass fractions don't add to unity!")
-            raise ValueError
+        assert(self.X + self.Y + self.Z == 1, "Mass fractions don't add to unity!")
         self.get_data()
         self.CNOfrac = sum([float(self.lines[ii].strip().split()[3]) for ii in [36,37,38]])
 
