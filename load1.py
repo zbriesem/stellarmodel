@@ -32,7 +32,7 @@ def load1(Pc, Tc, L, m, X, Y, Z, coreconv=True):
     """
     rhoc = density.density(Pc, Tc, X, Y, Z)
     opacities = opacity.OpacityTable(X, Y, Z)
-    XCNO = Z * opacities.CNOfrac
+    XCNO = opacities.XCNO
     epsilon = nuc.eppeff(Tc, rhoc, X, Y) + nuc.eCNOeff(Tc, rhoc, X, XCNO)
     lum = lum_near_center(m, epsilon)
 

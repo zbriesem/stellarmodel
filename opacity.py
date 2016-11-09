@@ -35,7 +35,7 @@ class OpacityTable:
         self.Z = Z
         assert(self.X + self.Y + self.Z == 1, "Mass fractions don't add to unity!")
         self.get_data()
-        self.CNOfrac = sum([float(self.lines[ii].strip().split()[3]) for ii in [36,37,38]])
+        self.XCNO = self.Z * sum([float(self.lines[ii].strip().split()[3]) for ii in [36, 37, 38]])
 
     def read_summary(self, begin=62, end=188):
         """read all compositions available in data file"""

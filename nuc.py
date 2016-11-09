@@ -11,7 +11,7 @@ def eppeff(T, rho, X, Y):
     T    :    Temperature in K
     rho  :    density in g/cm^2
     X    :    Hydrogen mass fraction
-    Y    :    Helium mass fraciton
+    Y    :    Helium mass fraction
 
     Returns:
 
@@ -32,7 +32,7 @@ def eCNOeff(T, rho, X, XCNO):
     T    :    Temperature in K
     rho  :    density in g/cm^2
     X    :    Hydrogen mass fraction
-    XCNO :    Carbon, nitrogen, oxygen mass fraciton
+    XCNO :    Carbon, nitrogen, oxygen mass fraction
 
     Returns:
 
@@ -49,7 +49,7 @@ def psi(T, Y):
     Arguments:
 
     T    :    Temperature in K
-    Y    :    Helium mass fraciton
+    Y    :    Helium mass fraction
 
     Returns:
 

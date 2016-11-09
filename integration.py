@@ -1,98 +1,93 @@
 import numpy as np
+from scipy.optimize import interp1d
+
+# from Numerical Recipes pg. 717
+a1, a2, a3, a4, a5, a6 = 0, 1 / 5, 3 / 10, 3 / 5, 1., 7 / 8
+b21 = 1 / 5
+b31, b32 = 3 / 40, 9 / 40,
+b41, b42, b43 = 3 / 10, -9 / 10, 6 / 5
+b51, b52, b53, b54 = -11 / 54, 5 / 2, -70 / 27, 35 / 27
+b61, b62, b63, b64, b65 = 1631 / 55296, 175 / \
+    512, 575 / 13824, 44275 / 110592, 253 / 4096
+c1, c2, c3, c4, c5, c6 = 37 / 378, 0., 250 / 621, 125 / 594, 0., 512 / 1771
+c1s, c2s, c3s, c4s, c5s, c6s = 2825 / 27648, 0., 18575 / \
+    48384, 13525 / 55296, 277 / 14336, 1 / 4
 
 
-a21, = 1. / 4.,
-a31, a32, = 3. / 32., 9. / 32.,
-a41, a42, a43, =  1932. / 2197., -7200. / 2197., 7296. / 2197.,
-a51, a52, a53, a54, =    439. / 216., -8., 3680. / 513., -845. / 4104.,
-a61, a62, a63, a64, a65, = -8. / 27., 2., - \
-    3544. / 2565., 1859. / 4104., -11. / 40,
-b1, b2, b3, b4, b5, b6 = 16. / 135., 0., 6656. / \
-    12825., 28561. / 56430., -9. / 50, 2. / 55.
-b1s, b2s, b3s, b4s, b5s, b6s = 25. / 216., 0., 1408. / 2565., 2197. / 4104., -1. / \
-    5, 0.
-c1, c2, c3, c4, c5, c6 = 0., 1. / 4., 3. / 8., 12. / 13., 1., 1. / 2.
+def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
+    """adaptive step control for Cash-Karp Embedded Runga-Kutta method
 
+    Arguments:
+    f    :    derivative function, from .derivs
+    x    :    mass coordinate
+    y    :    r, l, P, T values for arguments of .derivs
+    h0   :    mass step size
+    args :    args pass to .derivs
+    n    :    tolerance parameter
 
-def adaptive_step_control(f, x, y, h, args=(), tol=1e-8):
+    Returns:
+
+    ystep:    + dr, dl, dP, dT
+    h1   :    next mass step size
+    """
 
     x = np.asarray(x)
     y = np.asarray(y)
-    assert(y.ndim == 1, "y must be one dimensional")
-    g = lambda x, y: f(y, x, *args)
-    k = np.empty((6, y.shape[0]))
+    k = np.zeros((6, y.shape[0]), dtype=float)
 
-    k[0] = h * g(x + c1 * h, y)
-    k[1] = h * g(x + c2 * h, y + a21 * k[0])
-    k[2] = h * g(x + c3 * h, y + a31 * k[0] + a32 * k[1])
-    k[3] = h * g(x + c4 * h, y + a41 * k[0] + a42 * k[1] + a43 * k[2])
-    k[4] = h * g(x + c5 * h, y + a51 * k[0] + a52 *
-                 k[1] + a53 * k[2] + a54 * k[3])
-    k[5] = h * g(x + c6 * h, y + a61 * k[0] + a62 * k[1] +
-                 a63 * k[2] + a64 * k[3] + a65 * k[4])
+    k[0] = h0 * f(x + a1 * h0, y, *args)
+    k[1] = h0 * f(x + a2 * h0, y + b21 * k[0], *args)
+    k[2] = h0 * f(x + a3 * h0, y + b31 * k[0] + b32 * k[1], *args)
+    k[3] = h0 * f(x + a4 * h0, y + b41 * k[0] + b42 * k[1] + b43 * k[2], *args)
+    k[4] = h0 * f(x + a5 * h0, y + b51 * k[0] + b52 *
+                  k[1] + b53 * k[2] + b54 * k[3], *args)
+    k[5] = h0 * f(x + a6 * h0, y + b61 * k[0] + b62 * k[1] +
+                  b63 * k[2] + b64 * k[3] + b65 * k[4], *args)
 
-    ystep = y + (b1s * k[0] + b2s * k[1] + b3s * k[2] +
-                 b4s * k[3] + b5s * k[4] + b6s * k[5])
-    err = (b1 * k[0] + b2 * k[1] + b3 * k[2] + b4 * k[3] + b5 * k[4] + b6 * k[5]) - \
-        (b1s * k[0] + b2s * k[1] + b3s * k[2] +
-         b4s * k[3] + b5s * k[4] + b6s * k[5])
-    adj = tol / np.abs(np.min(err))
-    if adj > 1e3:
-        adj = 1e3
-    if not np.isfinite(adj):
-        adj = 1.0
-    opts = np.abs(np.hstack((y / k[0], 1.1)))
-    hn = 0.1 * h * adj
-    return ystep, hn
+    ystep = y + (c1 * k[0] + c2 * k[1] + c3 * k[2] +
+                 c4 * k[3] + c5 * k[4] + c6 * k[5])
+    yembed = y + (c1s * k[0] + c2s * k[1] + c3s * k[2] +
+                  c4s * k[3] + c5s * k[4] + c6s * k[5])
+    delta = ystep - yembed
+
+    E = n / np.abs(np.min(delta))
+    if E > 1e3:
+        E = 1e3
+    if not np.isfinite(E):
+        E = 1.0
+
+    h1 = 0.1 * h0 * E
+    return ystep, h1
 
 
-def integrate(g, x, y0, h0, args=(), tol=1e-8, N=10000):
-    """integrate
+def integrate(f, x, y0, h0, args=(), n=1e-8, lim=10000):
+    """integrate derivative along mass coordinates
 
     Arguments:
-    
-    g    :    derivative function, from .derivs
-    x    :    steps
+
+    f    :    derivative function, from .derivs
+    x    :    mass coordinates
     y0   :    initial conditions
     h0   :    step size
     args :    args that pass to .derivs
-    tol  :    tolerance parameter
-    N    :    max step
+    n    :    tolerance parameter
+    lim  :    max step
 
     Returns:
 
     y    :    interpolation function for integral evaluated at each step
-    data :    adaptive step sizes
+    hs   :    adaptive step sizes
     """
-    data = {}
-    x = np.asarray(x)
-    y0 = np.asarray(y0)
-    nv = y0.shape[0]
-    no = x.shape[0]
-    y = np.empty((no, nv))
-    hc = h0
-    xc = x[0]
-    xn = xc
-    yc = y0
-    yo = np.empty((N, nv))
-    xo = np.empty((N))
-    ho = np.empty((N))
+    hc = h0; xc = x[0]; xn = xc; yc = y0
+    ys = []; xs = []; hs = []
     i = 0
-    while (xc - x[-1]) / (x[-1] - x[0]) <= 0 and i < N:
+    while (xc - x[-1]) / (x[-1] - x[0]) <= 0 and i < lim:
         i += 1
         xn += hc
-        yc, hc = adaptive_step_control(g, xc, yc, hc, args=args, tol=tol)
-        xo[i] = xc
-        yo[i] = yc
-        ho[i] = hc
+        yc, hc = adaptive_step_control(f, xc, yc, hc, args=args, n=n)
+        xs.append(xc); ys.append(yc); hs.append(hc)
         xc = xn
-        print(hc)
+    yarr = np.asarray(ys)
+    y = interp1d(xs, yarr, axis=0)(x)
 
-    yo = yo[:i]
-    xo = xo[:i]
-    ho = ho[:i]
-    data['hu'] = ho
-
-    y = interp1d(xo, yo, axis=0, fill_value=np.nan)(x)
-
-    return y, data
+    return y, hs
