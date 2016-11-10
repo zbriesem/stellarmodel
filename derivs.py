@@ -81,31 +81,33 @@ def dTdm(r, m, T, lum, P, k):
 
     return -G * m * T / (4. * np.pi * r**4 * P) * grad
 
-def core_conv(k, lum, p, m, T):
+
+def core_conv(k, lum, P, m, T):
     coreconv = False
     grad = 3 * k * lum * P / (16 * np.pi * a * c * G * m * T**4)
     if grad >= nabla_ad:
         coreconv = True
     return coreconv
 
-def total_der(m, vals, X, Y, Z):
+
+def total_der(m, vals, *args):
     """ mass derivative of r, l, P, T. Packed for star.py
 
     Arguments:
 
     m    :    mass in g
     vals :    input [r, l, P, T]
-    X    :    Hydrogen mass fraction
-    Y    :    Helium mass fraction
-    Z    :    Metal mass fraction
+    args :    first must be opacity
 
     Returns:
 
     list :    mass derivative of r, l, P, T
     """
-    ks = opacity.OpacityTable(X, Y, Z)
+    assert(len(args) >= 1, "didn't pass opacities!")
+    ks = args[0]
+
     r, l, P, T = vals
-    rho = density.density(P, T, X, Y, Z)
+    rho = density.density(P, T, ks.X, ks.Y, ks.Z)
     k = ks.Rosseland_mean_opacity(rho, T)
 
-    return [drdm(r, m), dldm(rho, T, X, Y, ks.XCNO), dPdm(r, m), dTdm(r, m, T, l, P, k)]
+    return np.array([drdm(r, m), dldm(rho, T, ks.X, ks.Y, ks.XCNO), dPdm(r, m), dTdm(r, m, T, l, P, k)])

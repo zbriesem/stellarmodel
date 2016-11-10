@@ -24,21 +24,26 @@ class Star:
         self.Pc = Pc
         self.Tc = Tc
         self.M = M * Ms
-        self.dm = M * 1e-10
+        self.dm = self.M * 1e-10
         assert(self.fp < self.M, "Your fitting point is outside the star!")
 
     def center(self):
-        ivec = load1.center_vec(self.Pc, self.Tc, self.L, self.m, self.X, self.Y, self.Z)
+        """center-out integration
+        """
+        ivec = load1.center_vec(self.Pc, self.Tc, self.L, self.dm, self.X, self.Y, self.Z)
         m = [self.dm, self.fp]
 
-        self.coutvecs, self.chs = integration.integrate(derivs.total_der, m, ivec, self.dm, self.X, self.Y, self.Z)
-
-
+        self.coutvecs, self.chs = integration.integrate(derivs.total_der, m, ivec, self.dm, args=(self.ks,))
 
     def surface(self):
+        """surface-in integration
+        """
         ivec = load2.surface_vec(self.M, self.R, self.L, self.X, self.Y, self.Z)
         m = [self.M, self.fp]
 
-        self.soutvecs, self.hs = integration.integrate(derivs.total_der, m, ivec, self.dm, self.X, self.Y, self.Z)
+        self.soutvecs, self.hs = integration.integrate(derivs.total_der, m, ivec, self.dm, args=(self.ks,))
 
-
+    def return_vec(self):
+        """returns final vec, use after integration and matching fitting point
+        """
+        return [self.R, self.L, self.Pc, self.Tc]

@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import interp1d
+from scipy.interpolate import interp1d
 
 # from Numerical Recipes pg. 717
 a1, a2, a3, a4, a5, a6 = 0, 1 / 5, 3 / 10, 3 / 5, 1., 7 / 8
@@ -50,11 +50,14 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
                   c4s * k[3] + c5s * k[4] + c6s * k[5])
     delta = ystep - yembed
 
-    E = n / np.abs(np.min(delta))
+    mindelta = np.abs(np.min(delta))
+
+    if mindelta <= 1e-20:
+        E = 1
+    else:
+        E = n / mindelta
     if E > 1e3:
         E = 1e3
-    if not np.isfinite(E):
-        E = 1.0
 
     h1 = 0.1 * h0 * E
     return ystep, h1
@@ -78,15 +81,24 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=10000):
     y    :    vector evaluated at each hs
     hs   :    adaptive step sizes
     """
-    hc = h0; xc = x[0]; xn = xc; yc = y0
-    ys = []; xs = []; hs = []
+    hc = h0
+    xc = x[0]
+    xn = xc
+    yc = y0
+    ys = []
+    xs = []
+    hs = []
     i = 0
     while (xc - x[-1]) / (x[-1] - x[0]) <= 0 and i < lim:
         i += 1
         xn += hc
         yc, hc = adaptive_step_control(f, xc, yc, hc, args=args, n=n)
-        xs.append(xc); ys.append(yc); hs.append(hc)
+        xs.append(xc)
+        ys.append(yc)
+        hs.append(hc)
         xc = xn
+        print(hc)
+        print((xc - x[-1]) / (x[-1] - x[0]))
     yarr = np.asarray(ys)
     y = interp1d(xs, yarr, axis=0)(x)
 
