@@ -7,11 +7,9 @@ b21 = 1 / 5
 b31, b32 = 3 / 40, 9 / 40,
 b41, b42, b43 = 3 / 10, -9 / 10, 6 / 5
 b51, b52, b53, b54 = -11 / 54, 5 / 2, -70 / 27, 35 / 27
-b61, b62, b63, b64, b65 = 1631 / 55296, 175 / \
-    512, 575 / 13824, 44275 / 110592, 253 / 4096
+b61, b62, b63, b64, b65 = 1631 / 55296, 175 / 512, 575 / 13824, 44275 / 110592, 253 / 4096
 c1, c2, c3, c4, c5, c6 = 37 / 378, 0., 250 / 621, 125 / 594, 0., 512 / 1771
-c1s, c2s, c3s, c4s, c5s, c6s = 2825 / 27648, 0., 18575 / \
-    48384, 13525 / 55296, 277 / 14336, 1 / 4
+c1s, c2s, c3s, c4s, c5s, c6s = 2825 / 27648, 0., 18575 / 48384, 13525 / 55296, 277 / 14336, 1 / 4
 
 
 def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
@@ -39,27 +37,24 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     k[1] = h0 * f(x + a2 * h0, y + b21 * k[0], *args)
     k[2] = h0 * f(x + a3 * h0, y + b31 * k[0] + b32 * k[1], *args)
     k[3] = h0 * f(x + a4 * h0, y + b41 * k[0] + b42 * k[1] + b43 * k[2], *args)
-    k[4] = h0 * f(x + a5 * h0, y + b51 * k[0] + b52 *
-                  k[1] + b53 * k[2] + b54 * k[3], *args)
-    k[5] = h0 * f(x + a6 * h0, y + b61 * k[0] + b62 * k[1] +
-                  b63 * k[2] + b64 * k[3] + b65 * k[4], *args)
+    k[4] = h0 * f(x + a5 * h0, y + b51 * k[0] + b52 * k[1] + b53 * k[2] + b54 * k[3], *args)
+    k[5] = h0 * f(x + a6 * h0, y + b61 * k[0] + b62 * k[1] + b63 * k[2] + b64 * k[3] + b65 * k[4], *args)
 
-    ystep = y + (c1 * k[0] + c2 * k[1] + c3 * k[2] +
-                 c4 * k[3] + c5 * k[4] + c6 * k[5])
-    yembed = y + (c1s * k[0] + c2s * k[1] + c3s * k[2] +
-                  c4s * k[3] + c5s * k[4] + c6s * k[5])
+    ystep = y + (c1 * k[0] + c2 * k[1] + c3 * k[2] + c4 * k[3] + c5 * k[4] + c6 * k[5])
+    yembed = y + (c1s * k[0] + c2s * k[1] + c3s * k[2] + c4s * k[3] + c5s * k[4] + c6s * k[5])
+
     delta = ystep - yembed
 
     mindelta = np.abs(np.min(delta))
-
-    if mindelta <= 1e-20:
+    print(mindelta)
+    if mindelta == 0:
         E = 1
     else:
         E = n / mindelta
     if E > 1e3:
         E = 1e3
+    h1 = h0 * E
 
-    h1 = 0.1 * h0 * E
     return ystep, h1
 
 
@@ -89,16 +84,17 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=10000):
     xs = []
     hs = []
     i = 0
+
     while (xc - x[-1]) / (x[-1] - x[0]) <= 0 and i < lim:
         i += 1
         xn += hc
         yc, hc = adaptive_step_control(f, xc, yc, hc, args=args, n=n)
+
         xs.append(xc)
         ys.append(yc)
         hs.append(hc)
         xc = xn
-        print(hc)
-        print((xc - x[-1]) / (x[-1] - x[0]))
+
     yarr = np.asarray(ys)
     y = interp1d(xs, yarr, axis=0)(x)
 

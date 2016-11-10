@@ -67,6 +67,6 @@ def psi(T, Y):
     g = gaussian_filter1d(f(Y, T7vals), 1)
     h = interp1d(T7vals, g)
 
-    Ts = T7.clip(.5, 3.5)
+    Ts = T7.clip(.75, 3.25)
 
     return np.round(h(Ts), 2)
