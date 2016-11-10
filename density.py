@@ -43,7 +43,6 @@ def density(P, T, X, Y, Z):
     """
     mu0 = mu(X, Y, Z)
     rho = (mu0 * mH) / (kb * T) * (P - a / 3 * T**4)
-    print(rho)
     return rho
 
 

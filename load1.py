@@ -9,7 +9,7 @@ mH = 1.67262e-24  # H+ mass (proton)
 kb = 1.3807e-16  # boltzmann constant
 
 
-def center_vec(Pc, Tc, L, m, X, Y, Z, coreconv=False):
+def center_vec(Pc, Tc, L, m, ks, coreconv=False):
     """ central values of radius, luminosity, pressure and temperature
 
     Arguments:
@@ -29,13 +29,12 @@ def center_vec(Pc, Tc, L, m, X, Y, Z, coreconv=False):
     P    :    pressure at mass corrdinate m in dyne/cm^2
     T    :    temperature at mass corrdinate m of star in K
     """
-    rhoc = density.density(Pc, Tc, X, Y, Z)
-    opacities = opacity.OpacityTable(X, Y, Z)
-    XCNO = opacities.XCNO
-    epsilon = nuc.eppeff(Tc, rhoc, X, Y) + nuc.eCNOeff(Tc, rhoc, X, XCNO)
+    rhoc = density.density(Pc, Tc, ks.X, ks.Y, ks.Z)
+
+    epsilon = nuc.eppeff(Tc, rhoc, ks.X, ks.Y) + nuc.eCNOeff(Tc, rhoc, ks.X, ks.XCNO)
     lum = lum_near_center(m, epsilon)
 
-    kc = opacities.Rosseland_mean_opacity(rhoc, Tc)
+    kc = ks.Rosseland_mean_opacity(rhoc, Tc)
     P = pressure_near_center(m, Pc, rhoc)
 
     T = temp_near_center(m, Tc, Pc, rhoc, epsilon, kc=kc, coreconv=coreconv)
@@ -72,8 +71,7 @@ def pressure_near_center(m, Pc, rho):
 
     P    :    pressure at mass coordinate m in dyne/cm^2
     """
-    P = -1. * (3. * G) / (8 * np.pi) * \
-        (4 * np.pi * rho / 3.)**(4 / 3) * m**(2 / 3)
+    P = -1. * (3. * G) / (8 * np.pi) * (4 * np.pi * rho / 3.)**(4 / 3) * m**(2 / 3)
     return Pc + P
 
 
@@ -98,13 +96,11 @@ def temp_near_center(m, Tc, Pc, rho, epsilon, kc=None, coreconv=False):
         print("Requires either convection or opacity at core")
         raise ValueError
     if coreconv:
-        T1 = -1. * (np.pi / 6)**(1 / 3) * G * nabla_ad * \
-            rho**(4 / 3) / Pc * m**(2 / 3)
+        T1 = -1. * (np.pi / 6)**(1 / 3) * G * nabla_ad * rho**(4 / 3) / Pc * m**(2 / 3)
         T = np.exp(np.log(Tc) + T1)
 
     else:
-        T1 = -1 / (2 * a * c) * (3 / (4 * np.pi))**(2 / 3) * \
-            kc * epsilon * rho**(4 / 3) * m**(2 / 3)
+        T1 = -1 / (2 * a * c) * (3 / (4 * np.pi))**(2 / 3) * kc * epsilon * rho**(4 / 3) * m**(2 / 3)
         T = (Tc**4 + T1)**(1 / 4)
     return T
 

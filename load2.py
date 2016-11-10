@@ -10,7 +10,7 @@ mH = 1.67262e-24  # H+ mass (proton)
 kb = 1.3807e-16  # boltzmann constant
 
 
-def surface_vec(m, R, L, X, Y, Z):
+def surface_vec(m, R, L, ks):
     """ surface values of radius, luminosity, pressure and temperature
 
     Arguments:
@@ -32,11 +32,11 @@ def surface_vec(m, R, L, X, Y, Z):
     rad = R
     lum = L
     T = temp_eff(L, R)
-    opacities = opacity.OpacityTable(X, Y, Z)
-    P1 = guess(1.1, T, X, Y, Z, multiplier=2)
-    P2 = guess(1.1e8, T, X, Y, Z, multiplier=1 / 2)
 
-    P = fminbound(residual, P1, P2, args=(m, T, R, X, Y, Z, opacities))
+    P1 = guess(1.1, T, ks.X, ks.Y, ks.Z, multiplier=2)
+    P2 = guess(1.1e8, T, ks.X, ks.Y, ks.Z, multiplier=1 / 2)
+
+    P = fminbound(residual, P1, P2, args=(m, T, R, ks))
 
     return rad, lum, P, T
 
@@ -102,7 +102,7 @@ def guess(Pguess, T, X, Y, Z, multiplier=3):
     return Pguess
 
 
-def residual(P, m, T, R, X, Y, Z, opacities):
+def residual(P, m, T, R, ks):
     """ residual of the calculated surface pressure and the bounds found by guess()
 
     Arguments:
@@ -120,8 +120,8 @@ def residual(P, m, T, R, X, Y, Z, opacities):
 
     P    :    an extremum of the pressure on the opacity table at a given temperature
     """
-    rho = density.density(P, T, X, Y, Z)
-    kappa_bar = opacities.Rosseland_mean_opacity(rho, T)
+    rho = density.density(P, T, ks.X, ks.Y, ks.Z)
+    kappa_bar = ks.Rosseland_mean_opacity(rho, T)
     Ps = pressure_surface(m, R, kappa_bar)
     resid = np.abs(Ps - P)
     return resid

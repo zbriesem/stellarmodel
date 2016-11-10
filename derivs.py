@@ -102,4 +102,4 @@ def total_der(m, vals, *args):
     rho = density.density(P, T, ks.X, ks.Y, ks.Z)
     k = ks.Rosseland_mean_opacity(rho, T)
 
-    return np.array([drdm(r, m), dldm(rho, T, ks.X, ks.Y, ks.XCNO), dPdm(r, m), dTdm(r, m, T, l, P, k)])
+    return np.array([drdm(r, rho), dldm(rho, T, ks.X, ks.Y, ks.XCNO), dPdm(r, m), dTdm(r, m, T, l, P, k)])
