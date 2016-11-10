@@ -10,7 +10,7 @@ mH = 1.67262e-24  # H+ mass (proton)
 kb = 1.3807e-16  # boltzmann constant
 
 
-def load2(m, R, L, X, Y, Z):
+def surface_vec(m, R, L, X, Y, Z):
     """ surface values of radius, luminosity, pressure and temperature
 
     Arguments:

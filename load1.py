@@ -9,7 +9,7 @@ mH = 1.67262e-24  # H+ mass (proton)
 kb = 1.3807e-16  # boltzmann constant
 
 
-def load1(Pc, Tc, L, m, X, Y, Z, coreconv=True):
+def center_vec(Pc, Tc, L, m, X, Y, Z, coreconv=True):
     """ central values of radius, luminosity, pressure and temperature
 
     Arguments:

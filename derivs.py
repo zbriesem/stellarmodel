@@ -73,15 +73,23 @@ def dTdm(r, m, T, lum, P, k):
     Returns:
 
     dTdm :    mass derivative of temperature
+    coreconv :whether core convection occurs
     """
     grad = 3 * k * lum * P / (16 * np.pi * a * c * G * m * T**4)
-    if grad > nabla_ad:
+    if grad >= nabla_ad:
         grad = nabla_ad
+
     return -G * m * T / (4. * np.pi * r**4 * P) * grad
 
+def core_conv(k, lum, p, m, T):
+    coreconv = False
+    grad = 3 * k * lum * P / (16 * np.pi * a * c * G * m * T**4)
+    if grad >= nabla_ad:
+        coreconv = True
+    return coreconv
 
 def total_der(m, vals, X, Y, Z):
-    """ mass derivative of r, l, P, T. Packed for integration.py
+    """ mass derivative of r, l, P, T. Packed for star.py
 
     Arguments:
 

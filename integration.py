@@ -19,15 +19,15 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
 
     Arguments:
     f    :    derivative function, from .derivs
-    x    :    mass coordinate
-    y    :    r, l, P, T values for arguments of .derivs
-    h0   :    mass step size
+    x    :    mass extrema
+    y    :    r, l, P, T values for arguments of .derivs, from load1 or load2
+    h0   :    initial mass step size
     args :    args pass to .derivs
     n    :    tolerance parameter
 
     Returns:
 
-    ystep:    + dr, dl, dP, dT
+    ystep:    + dr, dl, dP, dT vector
     h1   :    next mass step size
     """
 
@@ -66,16 +66,16 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=10000):
     Arguments:
 
     f    :    derivative function, from .derivs
-    x    :    mass coordinates
-    y0   :    initial conditions
-    h0   :    step size
+    x    :    mass extrema
+    y0   :    initial conditions, load1 or load2
+    h0   :    inital mass step size
     args :    args that pass to .derivs
     n    :    tolerance parameter
     lim  :    max step
 
     Returns:
 
-    y    :    interpolation function for integral evaluated at each step
+    y    :    vector evaluated at each hs
     hs   :    adaptive step sizes
     """
     hc = h0; xc = x[0]; xn = xc; yc = y0
