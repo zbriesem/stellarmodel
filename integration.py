@@ -41,20 +41,14 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     k[5] = h0 * f(x + a6 * h0, y + b61 * k[0] + b62 * k[1] + b63 * k[2] + b64 * k[3] + b65 * k[4], *args)
 
     ystep = y + (c1 * k[0] + c2 * k[1] + c3 * k[2] + c4 * k[3] + c5 * k[4] + c6 * k[5])
-    yembed = y + (c1s * k[0] + c2s * k[1] + c3s * k[2] + c4s * k[3] + c5s * k[4] + c6s * k[5])
 
-    delta = ystep - yembed
+    delta = (c1 - c1s) * k[0] + (c2 - c2s) * k[1] + (c3 - c3s) * k[2] + (c4 - c4s) * k[3] + (c5 - c5s) * k[4] + (c6 - c6s) * k[5]
 
-    mindelta = np.abs(np.min(delta))
-    print(mindelta)
-    if mindelta == 0:
-        E = 1
-    else:
-        E = n / mindelta
-    if E > 1e3:
-        E = 1e3
-    h1 = h0 * E
-
+    ratio = np.max(np.abs(1e-8 * k[0] / delta)**(.2))
+    if not np.isfinite(ratio):
+        ratio = 1.
+    h1 = .999 * h0 * ratio
+    print(h1)
     return ystep, h1
 
 

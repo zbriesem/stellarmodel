@@ -21,6 +21,7 @@ def eppeff(T, rho, X, Y):
     psi0 = psi(T, Y)
     f11 = 1  # weak screening
     g11 = 1 + 3.82 * T9 + 1.51 * T9**2 + .144 * T9**3 - .0114 * T9**4
+
     return 2.57e4 * psi0 * f11 * g11 * rho * X**2 / T9**(2 / 3) * np.exp(-3.381 / T9**(1 / 3))
 
 

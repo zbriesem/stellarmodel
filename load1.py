@@ -1,5 +1,5 @@
 import numpy as np
-from . import nuc, density, opacity, derivs
+from . import nuc, density, opacity
 G = 6.673e-8  # Newton's gravitational constant
 nabla_ad = .4  # Adiabatic temperature gradient
 c = 2.99792458e10  # speed of light
@@ -9,7 +9,7 @@ mH = 1.67262e-24  # H+ mass (proton)
 kb = 1.3807e-16  # boltzmann constant
 
 
-def center_vec(Pc, Tc, L, m, X, Y, Z):
+def center_vec(Pc, Tc, L, m, X, Y, Z, coreconv=False):
     """ central values of radius, luminosity, pressure and temperature
 
     Arguments:
@@ -37,8 +37,6 @@ def center_vec(Pc, Tc, L, m, X, Y, Z):
 
     kc = opacities.Rosseland_mean_opacity(rhoc, Tc)
     P = pressure_near_center(m, Pc, rhoc)
-
-    coreconv = derivs.core_conv(kc, lum, Pc, m, Tc)
 
     T = temp_near_center(m, Tc, Pc, rhoc, epsilon, kc=kc, coreconv=coreconv)
     r = radius_near_center(m, rhoc)
@@ -79,7 +77,7 @@ def pressure_near_center(m, Pc, rho):
     return Pc + P
 
 
-def temp_near_center(m, Tc, Pc, rho, epsilon, kc=None, coreconv=True):
+def temp_near_center(m, Tc, Pc, rho, epsilon, kc=None, coreconv=False):
     """ temperature at certain mass coordinate near center
 
     Arguments:
@@ -103,6 +101,7 @@ def temp_near_center(m, Tc, Pc, rho, epsilon, kc=None, coreconv=True):
         T1 = -1. * (np.pi / 6)**(1 / 3) * G * nabla_ad * \
             rho**(4 / 3) / Pc * m**(2 / 3)
         T = np.exp(np.log(Tc) + T1)
+
     else:
         T1 = -1 / (2 * a * c) * (3 / (4 * np.pi))**(2 / 3) * \
             kc * epsilon * rho**(4 / 3) * m**(2 / 3)

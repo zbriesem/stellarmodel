@@ -1,5 +1,3 @@
-import numpy as np
-
 G = 6.673e-8  # Newton's gravitational constant
 nabla_ad = .4  # Adiabatic temperature gradient
 c = 2.99792458e10  # speed of light
@@ -45,6 +43,7 @@ def density(P, T, X, Y, Z):
     """
     mu0 = mu(X, Y, Z)
     rho = (mu0 * mH) / (kb * T) * (P - a / 3 * T**4)
+    print(rho)
     return rho
 
 

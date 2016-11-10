@@ -79,6 +79,7 @@ class OpacityTable:
 
         k    :    Rosseland mean opacity in cm^2/g"""
         T6 = T / 1e6
+
         log_R = np.log10(rho / T6**3)
         log_T = np.log10(T)
 

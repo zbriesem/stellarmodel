@@ -1,5 +1,5 @@
 import numpy as np
-from . import nuc, opacity, density
+from . import nuc, density
 
 G = 6.673e-8  # Newton's gravitational constant
 nabla_ad = .4  # Adiabatic temperature gradient
@@ -73,21 +73,13 @@ def dTdm(r, m, T, lum, P, k):
     Returns:
 
     dTdm :    mass derivative of temperature
-    coreconv :whether core convection occurs
     """
     grad = 3 * k * lum * P / (16 * np.pi * a * c * G * m * T**4)
+
     if grad >= nabla_ad:
         grad = nabla_ad
 
     return -G * m * T / (4. * np.pi * r**4 * P) * grad
-
-
-def core_conv(k, lum, P, m, T):
-    coreconv = False
-    grad = 3 * k * lum * P / (16 * np.pi * a * c * G * m * T**4)
-    if grad >= nabla_ad:
-        coreconv = True
-    return coreconv
 
 
 def total_der(m, vals, *args):
