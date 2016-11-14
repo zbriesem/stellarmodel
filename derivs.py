@@ -97,7 +97,7 @@ def total_der(m, vals, *args):
     """
     assert(len(args) >= 1, "didn't pass opacities!")
     ks = args[0]
-    print(vals)
+
     r, l, P, T = vals
     rho = density.density(P, T, ks.X, ks.Y, ks.Z)
     k = ks.Rosseland_mean_opacity(rho, T)

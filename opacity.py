@@ -68,7 +68,7 @@ class OpacityTable:
         self.log_k[self.log_k == 9.999] = np.nan
 
     def Rosseland_mean_opacity(self, rho, T):
-        """linear interpolation over the log values of the Rosseland mean opacities at the initialized composition
+        """linear interpolation over the values of the Rosseland mean opacities at the initialized composition
 
         Arguments:
 
@@ -80,12 +80,10 @@ class OpacityTable:
         k    :    Rosseland mean opacity in cm^2/g"""
         T6 = T / 1e6
 
-        log_R = np.log10(rho / T6**3)
-        log_T = np.log10(T)
+        R = rho / T6**3
+        k = 10**self.log_k
 
-        grid_log_R, grid_log_T = np.meshgrid(self.log_R, self.log_T)
+        grid_R, grid_T = np.meshgrid(10**self.log_R, 10**self.log_T)
+        interpolator = LinearNDInterpolator((grid_R.flatten(), grid_T.flatten()), k.flatten())
 
-        interpolator = LinearNDInterpolator(
-            (grid_log_R.flatten(), grid_log_T.flatten()), self.log_k.flatten())
-
-        return 10**interpolator((log_R, log_T))
+        return interpolator(R, T)
