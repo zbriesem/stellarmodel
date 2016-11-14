@@ -34,7 +34,6 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     k = np.zeros((6, y.shape[0]), dtype=float)
 
     k[0] = h0 * f(x + a1 * h0, y, *args)
-
     k[1] = h0 * f(x + a2 * h0, y + b21 * k[0], *args)
     k[2] = h0 * f(x + a3 * h0, y + b31 * k[0] + b32 * k[1], *args)
     k[3] = h0 * f(x + a4 * h0, y + b41 * k[0] + b42 * k[1] + b43 * k[2], *args)
@@ -50,11 +49,11 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     if not np.isfinite(ratio):
         ratio = 2
     h1 = .9 * h0 * ratio
-    print(ystep)
+
     return ystep, h1
 
 
-def integrate(f, x, y0, h0, args=(), n=1e-8, lim=10000):
+def integrate(f, x, y0, h0, args=(), n=1e-8, lim=1000):
     """integrate derivative along mass coordinates
 
     Arguments:
