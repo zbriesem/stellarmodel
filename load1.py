@@ -1,5 +1,5 @@
 import numpy as np
-from . import nuc, density, opacity
+from . import nuc, density
 G = 6.673e-8  # Newton's gravitational constant
 nabla_ad = .4  # Adiabatic temperature gradient
 c = 2.99792458e10  # speed of light
@@ -58,7 +58,7 @@ def core_conv(kc, lum, Pc, m, Tc):
 
     Returns:
 
-    coreconv :True for core convection    
+    coreconv :True for core convection
     """
     coreconv = False
     grad = 3 * kc * lum * Pc / (16 * np.pi * a * c * G * m * Tc**4)

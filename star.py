@@ -43,3 +43,7 @@ class Star:
 
         self.soutvecs, self.shs = integration.integrate(derivs.total_der, m, ivec, -1. * self.dm, args=(self.ks,))
 
+    def return_vec(self):
+        """returns final vec, use after integration and matching fitting point
+        """
+        return [self.R, self.L, self.Pc, self.Tc]

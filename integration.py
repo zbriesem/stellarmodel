@@ -2,7 +2,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 # from Numerical Recipes pg. 717
-a1, a2, a3, a4, a5, a6 = 0, 1 / 5, 3 / 10, 3 / 5, 1., 7 / 8
+a1, a2, a3, a4, a5, a6 = 0., 1 / 5, 3 / 10, 3 / 5, 1., 7 / 8
 b21 = 1 / 5
 b31, b32 = 3 / 40, 9 / 40,
 b41, b42, b43 = 3 / 10, -9 / 10, 6 / 5
@@ -41,13 +41,13 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     k[5] = h0 * f(x + a6 * h0, y + b61 * k[0] + b62 * k[1] + b63 * k[2] + b64 * k[3] + b65 * k[4], *args)
 
     ystep = y + (c1 * k[0] + c2 * k[1] + c3 * k[2] + c4 * k[3] + c5 * k[4] + c6 * k[5])
-
     delta = (c1 - c1s) * k[0] + (c2 - c2s) * k[1] + (c3 - c3s) * k[2] + (c4 - c4s) * k[3] + (c5 - c5s) * k[4] + (c6 - c6s) * k[5]
 
     ratio = np.max(np.abs(1e-8 * k[0] / delta)**(.2))
 
     if not np.isfinite(ratio):
-        ratio = 2
+        ratio = 1.1
+        print('bad step')
     h1 = .9 * h0 * ratio
 
     return ystep, h1
@@ -71,15 +71,9 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=1000):
     y    :    vector evaluated at each hs
     hs   :    adaptive step sizes
     """
-    hc = h0
-    xc = x[0]
-    xn = xc
-    yc = y0
-    ys = []
-    xs = []
-    hs = []
+    hc = h0; xc = x[0]; xn = xc; yc = y0
+    xs, ys, hs = [], [], []
     i = 0
-
     while (xc - x[-1]) / (x[-1] - x[0]) <= 0 and i < lim:
         i += 1
         xn += hc
@@ -89,7 +83,7 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=1000):
         ys.append(yc)
         hs.append(hc)
         xc = xn
-    # one last step
+    # one last step past fp
     yc, hc = adaptive_step_control(f, xc, yc, hc, args=args, n=n)
 
     xs.append(xc)
@@ -98,6 +92,6 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=1000):
 
     yarr = np.asarray(ys)
     xarr = np.asarray(xs)
-    y = interp1d(xarr, yarr, axis=0)(x[-1])
+    y = interp1d(xarr, yarr, axis=0)
 
     return ys, xs
