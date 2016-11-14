@@ -9,7 +9,7 @@ mH = 1.67262e-24  # H+ mass (proton)
 kb = 1.3807e-16  # boltzmann constant
 
 
-def center_vec(Pc, Tc, L, m, ks, coreconv=False):
+def center_vec(Pc, Tc, L, m, ks):
     """ central values of radius, luminosity, pressure and temperature
 
     Arguments:
@@ -37,10 +37,34 @@ def center_vec(Pc, Tc, L, m, ks, coreconv=False):
     kc = ks.Rosseland_mean_opacity(rhoc, Tc)
     P = pressure_near_center(m, Pc, rhoc)
 
+    coreconv = core_conv(kc, lum, Pc, m, Tc)
+
     T = temp_near_center(m, Tc, Pc, rhoc, epsilon, kc=kc, coreconv=coreconv)
     r = radius_near_center(m, rhoc)
 
     return r, lum, P, T
+
+
+def core_conv(kc, lum, Pc, m, Tc):
+    """evaluates the radiative temperature gradient and compares to the adiabatic temperature gradient
+
+    Arguments:
+
+    kc   :    central opacity in cm^2/g
+    lum  :    luminosity at mass coordinate m of star in erg/s
+    Pc   :    central pressure in dyne/cm^2
+    m    :    arbitrarily small mass coordinate in g
+    Tc   :    central temperature in K
+
+    Returns:
+
+    coreconv :True for core convection    
+    """
+    coreconv = False
+    grad = 3 * kc * lum * Pc / (16 * np.pi * a * c * G * m * Tc**4)
+    if grad >= nabla_ad:
+        coreconv = True
+    return coreconv
 
 
 def radius_near_center(m, rho):
@@ -115,7 +139,7 @@ def lum_near_center(m, epsilon):
 
     Returns:
 
-    L    :    luminosity at mass corrdinate m of star in erg/s
+    L    :    luminosity at mass coordinate m of star in erg/s
     """
     return m * epsilon
 

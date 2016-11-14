@@ -16,7 +16,7 @@ class Star:
         """set fitting point to mass coordinate m in Ms, 0 < m < M"""
         self.fp = m * Ms
 
-    def set_init(self, R, L, Pc, Tc, M, coreconv=False):
+    def set_init(self, R, L, Pc, Tc, M):
         """set initial values of R in Rs, L in Ls, Pc in dynes/cm^2, Tc in K, M in Ms
         """
         self.R = R * Rs
@@ -25,13 +25,12 @@ class Star:
         self.Tc = Tc
         self.M = M * Ms
         self.dm = self.M * 1e-10
-        self.coreconv = coreconv
         assert(self.fp < self.M, "Your fitting point is outside the star!")
 
     def center(self):
         """center-out integration
         """
-        ivec = load1.center_vec(self.Pc, self.Tc, self.L, self.dm, self.ks, coreconv=self.coreconv)
+        ivec = load1.center_vec(self.Pc, self.Tc, self.L, self.dm, self.ks)
         m = [self.M * 1e-6, self.fp]
 
         self.coutvecs, self.chs = integration.integrate(derivs.total_der, m, ivec, self.dm, args=(self.ks,))
@@ -44,7 +43,3 @@ class Star:
 
         self.soutvecs, self.shs = integration.integrate(derivs.total_der, m, ivec, -1. * self.dm, args=(self.ks,))
 
-    def return_vec(self):
-        """returns final vec, use after integration and matching fitting point
-        """
-        return [self.R, self.L, self.Pc, self.Tc]
