@@ -42,7 +42,7 @@ class Star:
         ivec = load2.surface_vec(self.M, self.R, self.L, self.ks)
         m = [self.M, self.fp]
 
-        self.soutvecs, self.hs = integration.integrate(derivs.total_der, m, ivec, self.dm, args=(self.ks,))
+        self.soutvecs, self.shs = integration.integrate(derivs.total_der, m, ivec, -1. * self.dm, args=(self.ks,))
 
     def return_vec(self):
         """returns final vec, use after integration and matching fitting point

@@ -34,6 +34,7 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     k = np.zeros((6, y.shape[0]), dtype=float)
 
     k[0] = h0 * f(x + a1 * h0, y, *args)
+
     k[1] = h0 * f(x + a2 * h0, y + b21 * k[0], *args)
     k[2] = h0 * f(x + a3 * h0, y + b31 * k[0] + b32 * k[1], *args)
     k[3] = h0 * f(x + a4 * h0, y + b41 * k[0] + b42 * k[1] + b43 * k[2], *args)
@@ -41,16 +42,15 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     k[5] = h0 * f(x + a6 * h0, y + b61 * k[0] + b62 * k[1] + b63 * k[2] + b64 * k[3] + b65 * k[4], *args)
 
     ystep = y + (c1 * k[0] + c2 * k[1] + c3 * k[2] + c4 * k[3] + c5 * k[4] + c6 * k[5])
-
+    print(k)
     delta = (c1 - c1s) * k[0] + (c2 - c2s) * k[1] + (c3 - c3s) * k[2] + (c4 - c4s) * k[3] + (c5 - c5s) * k[4] + (c6 - c6s) * k[5]
 
     ratio = np.max(np.abs(1e-8 * k[0] / delta)**(.2))
-    #print(ratio)
+
     if not np.isfinite(ratio):
-        ratio = 40.
-    h1 = .9 * .025 * h0 * ratio
-    #h1 = h0
-    print(ystep)
+        ratio = 2
+    h1 = .9 * h0 * ratio
+
     return ystep, h1
 
 
@@ -90,8 +90,15 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=10000):
         ys.append(yc)
         hs.append(hc)
         xc = xn
+    # one last step
+    yc, hc = adaptive_step_control(f, xc, yc, hc, args=args, n=n)
+
+    xs.append(xc)
+    ys.append(yc)
+    hs.append(hc)
 
     yarr = np.asarray(ys)
-    y = interp1d(xs, yarr, axis=0)(x)
+    xarr = np.asarray(xs)
+    y = interp1d(xarr, yarr, axis=0)(x[-1])
 
-    return y, hs
+    return ys, xs
