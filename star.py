@@ -1,4 +1,5 @@
 from . import opacity, derivs, load1, load2, integration
+from scipy.interpolate import interp1d
 
 Rs = 6.96e10  # radius of sun in cm
 Ls = 3.828e33  # luminosity of sun in erg/s
@@ -31,9 +32,10 @@ class Star:
         """center-out integration
         """
         ivec = load1.center_vec(self.Pc, self.Tc, self.L, self.dm, self.ks)
-        m = [self.M * 1e-6, self.fp]
+        m = [self.dm, self.fp]
 
-        self.coutvecs, self.chs = integration.integrate(derivs.total_der, m, ivec, self.dm, args=(self.ks,))
+        self.coutvecs, self.cxs = integration.integrate(derivs.total_der, m, ivec, self.dm, args=(self.ks,))
+        self.cfp = interp1d(self.cxs, self.coutvecs, axis=0)(self.fp)
 
     def surface(self):
         """surface-in integration
@@ -41,9 +43,13 @@ class Star:
         ivec = load2.surface_vec(self.M, self.R, self.L, self.ks)
         m = [self.M, self.fp]
 
-        self.soutvecs, self.shs = integration.integrate(derivs.total_der, m, ivec, -1. * self.dm, args=(self.ks,))
+        self.soutvecs, self.sxs = integration.integrate(derivs.total_der, m, ivec, -1. * self.dm, args=(self.ks,))
+
+        self.sfp = interp1d(self.sxs, self.soutvecs, axis=0)(self.fp)
 
     def return_vec(self):
         """returns final vec, use after integration and matching fitting point
         """
         return [self.R, self.L, self.Pc, self.Tc]
+
+

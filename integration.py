@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.interpolate import interp1d
 
 # from Numerical Recipes pg. 717
 a1, a2, a3, a4, a5, a6 = 0., 1 / 5, 3 / 10, 3 / 5, 1., 7 / 8
@@ -89,9 +88,5 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=1000):
     xs.append(xc)
     ys.append(yc)
     hs.append(hc)
-
-    yarr = np.asarray(ys)
-    xarr = np.asarray(xs)
-    y = interp1d(xarr, yarr, axis=0)
 
     return ys, xs
