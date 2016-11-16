@@ -1,6 +1,6 @@
 import numpy as np
 
-# from Numerical Recipes pg. 717
+# from Numerical Recipes Second Edition pg. 717
 a1, a2, a3, a4, a5, a6 = 0., 1 / 5, 3 / 10, 3 / 5, 1., 7 / 8
 b21 = 1 / 5
 b31, b32 = 3 / 40, 9 / 40,

@@ -1,5 +1,6 @@
 from . import opacity, derivs, load1, load2, integration
 from scipy.interpolate import interp1d
+import numpy as np
 
 Rs = 6.96e10  # radius of sun in cm
 Ls = 3.828e33  # luminosity of sun in erg/s
@@ -13,20 +14,21 @@ class Star:
         self.ks = opacity.OpacityTable(self.X, self.Y, self.Z)
         self.XCNO = self.ks.XCNO
 
-    def set_fp(self, m):
-        """set fitting point to mass coordinate m in Ms, 0 < m < M"""
-        self.fp = m * Ms
-
-    def set_init(self, R, L, Pc, Tc, M):
-        """set initial values of R in Rs, L in Ls, Pc in dynes/cm^2, Tc in K, M in Ms
-        """
-        self.R = R * Rs
-        self.L = L * Ls
-        self.Pc = Pc
-        self.Tc = Tc
+    def set_mass(self, M, fp=.5):
+        """set mass in Ms and fitting point in M, 0 < fp < M"""
         self.M = M * Ms
+        self.fp = fp * self.M
         self.dm = self.M * 1e-10
         assert(self.fp < self.M, "Your fitting point is outside the star!")
+
+    def set_initial(self, *args):
+        """set initial values of R in Rs, L in Ls, Pc in dynes/cm^2, Tc in K, M in Ms
+        *args must be (R, L, Pc, Tc)
+        """
+        self.R = args[0] * Rs
+        self.L = args[1] * Ls
+        self.Pc = args[2]
+        self.Tc = args[3]
 
     def center(self):
         """center-out integration
@@ -51,5 +53,7 @@ class Star:
         """returns final vec, use after integration and matching fitting point
         """
         return [self.R, self.L, self.Pc, self.Tc]
+
+
 
 
