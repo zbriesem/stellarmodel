@@ -17,7 +17,7 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     Arguments:
     f    :    derivative function, from .derivs
     x    :    mass extrema
-    y    :    r, l, P, T values for arguments of .derivs, from load1 or load2
+    y    :    r, l, P, T values for arguments of .derivs
     h0   :    initial mass step size
     args :    args pass to .derivs
     n    :    tolerance parameter
@@ -60,7 +60,7 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=1000):
     f    :    derivative function, from .derivs
     x    :    mass extrema
     y0   :    initial conditions, load1 or load2
-    h0   :    inital mass step size
+    h0   :    inital mass step size, negative for surface to fp
     args :    args that pass to .derivs
     n    :    tolerance parameter
     lim  :    max step

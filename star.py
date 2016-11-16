@@ -1,6 +1,5 @@
 from . import opacity, derivs, load1, load2, integration
 from scipy.interpolate import interp1d
-import numpy as np
 
 Rs = 6.96e10  # radius of sun in cm
 Ls = 3.828e33  # luminosity of sun in erg/s
@@ -22,18 +21,18 @@ class Star:
         assert(self.fp < self.M, "Your fitting point is outside the star!")
 
     def set_initial(self, *args):
-        """set initial values of R in Rs, L in Ls, Pc in dynes/cm^2, Tc in K, M in Ms
+        """set initial values of R in cm, L in erg/s, Pc in dynes/cm^2, Tc in K, M in Ms
         *args must be (R, L, Pc, Tc)
         """
-        self.R = args[0] * Rs
-        self.L = args[1] * Ls
+        self.R = args[0]
+        self.L = args[1]
         self.Pc = args[2]
         self.Tc = args[3]
 
     def center(self):
         """center-out integration
         """
-        ivec = load1.center_vec(self.Pc, self.Tc, self.L, self.dm, self.ks)
+        ivec = load1.center_vec(self.Pc, self.Tc, self.dm, self.ks)
         m = [self.dm, self.fp]
 
         self.coutvecs, self.cxs = integration.integrate(derivs.total_der, m, ivec, self.dm, args=(self.ks,))

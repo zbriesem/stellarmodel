@@ -9,14 +9,13 @@ mH = 1.67262e-24  # H+ mass (proton)
 kb = 1.3807e-16  # boltzmann constant
 
 
-def center_vec(Pc, Tc, L, m, ks):
+def center_vec(Pc, Tc, m, ks):
     """ central values of radius, luminosity, pressure and temperature
 
     Arguments:
 
     Pc   :    central pressure in dyne/cm^2
     Tc   :    central temperature in K
-    L    :    luminosity of star in erg/s
     m    :    arbitrarily small mass coordinate in g
     X    :    Hydrogen mass fraction
     Y    :    Helium mass fraciton

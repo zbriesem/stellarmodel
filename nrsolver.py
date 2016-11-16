@@ -16,7 +16,7 @@ class NewtonRaphson:
 
         return np.asarray(self.Star.sfp - self.Star.cfp)
 
-    def jacobian(self, y0, F0, step=1e-6):
+    def jacobian(self, y0, F0, step=1e-10):
         dy0 = step * y0
 
         J = np.zeros((4, 4))
@@ -30,8 +30,9 @@ class NewtonRaphson:
 
             J[ii] = (F1 - F0) / dy0[ii]  # this is Jji
 
-        if all(F[-1] > F[0]):
-            return self.jacobian(y0, F0, step=-1. * step)
+        if any(np.abs(F[-1]) > np.abs(F0)):
+            print('attempting other direction')
+            return self.jacobian(y0, F0, step=-.1 * step)
         else:
             return J.T
 
@@ -43,7 +44,7 @@ class NewtonRaphson:
         while any(F0 > 1e-10 * y0):
             J = self.jacobian(y0, F0)
             jinv = np.linalg.inv(J)
-            delV = -F0.dot(jinv)
+            delV = -np.dot(jinv, F0)
             print(delV)
             y0 = y0 + delV
             self.set_init(*y0)
