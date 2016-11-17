@@ -24,7 +24,7 @@ class Star:
         """set initial values of R in cm, L in erg/s, Pc in dynes/cm^2, Tc in K, M in Ms
         *args must be (R, L, Pc, Tc)
         """
-        print('inital values set to ', *args)
+        #print('inital values set to ', *args)
         self.R = args[0]
         self.L = args[1]
         self.Pc = args[2]

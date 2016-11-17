@@ -14,7 +14,7 @@ class NewtonRaphson:
         self.Star.surface()
         return np.asarray(self.Star.sfp - self.Star.cfp)
 
-    def jacobian(self, y0, F0, step=1e-6):
+    def jacobian(self, y0, F0, step=1e-2):
         dy0 = step * y0
 
         J = np.zeros((4, 4))
@@ -33,7 +33,7 @@ class NewtonRaphson:
         y0 = np.asarray(args)
         F0 = self.discrepancy_vec()
 
-        while any(F0 > 1e-2 * y0):
+        while not all(np.abs(F0) < 1e-3 * y0):
             J = self.jacobian(y0, F0)
             jinv = np.linalg.inv(J)
             delV = -np.dot(jinv, F0)
