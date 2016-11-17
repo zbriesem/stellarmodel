@@ -37,7 +37,6 @@ def surface_vec(m, R, L, ks):
     P2 = guess(1.1e8, T, ks.X, ks.Y, ks.Z, multiplier=1 / 2)
 
     P = fminbound(residual, P1, P2, args=(m, T, R, ks))
-
     return rad, lum, P, T
 
 

@@ -24,6 +24,7 @@ class Star:
         """set initial values of R in cm, L in erg/s, Pc in dynes/cm^2, Tc in K, M in Ms
         *args must be (R, L, Pc, Tc)
         """
+        print('inital values set to ', *args)
         self.R = args[0]
         self.L = args[1]
         self.Pc = args[2]
@@ -32,19 +33,19 @@ class Star:
     def center(self):
         """center-out integration
         """
-        ivec = load1.center_vec(self.Pc, self.Tc, self.dm, self.ks)
+        self.civec = load1.center_vec(self.Pc, self.Tc, self.dm, self.ks)
         m = [self.dm, self.fp]
 
-        self.coutvecs, self.cxs = integration.integrate(derivs.total_der, m, ivec, self.dm, args=(self.ks,))
+        self.coutvecs, self.cxs = integration.integrate(derivs.total_der, m, self.civec, self.dm, args=(self.ks,))
         self.cfp = interp1d(self.cxs, self.coutvecs, axis=0)(self.fp)
 
     def surface(self):
         """surface-in integration
         """
-        ivec = load2.surface_vec(self.M, self.R, self.L, self.ks)
+        self.sivec = load2.surface_vec(self.M, self.R, self.L, self.ks)
         m = [self.M, self.fp]
 
-        self.soutvecs, self.sxs = integration.integrate(derivs.total_der, m, ivec, -1. * self.dm, args=(self.ks,))
+        self.soutvecs, self.sxs = integration.integrate(derivs.total_der, m, self.sivec, -1. * self.dm, args=(self.ks,))
 
         self.sfp = interp1d(self.sxs, self.soutvecs, axis=0)(self.fp)
 

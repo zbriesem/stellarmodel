@@ -40,7 +40,6 @@ def center_vec(Pc, Tc, m, ks):
 
     T = temp_near_center(m, Tc, Pc, rhoc, epsilon, kc=kc, coreconv=coreconv)
     r = radius_near_center(m, rhoc)
-
     return r, lum, P, T
 
 
