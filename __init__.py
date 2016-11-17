@@ -1,1 +1,1 @@
-from . import nuc, load1, load2, opacity, density, derivs, star, integration
+from . import nuc, load1, load2, opacity, density, derivs, star, integration, nrsolver
