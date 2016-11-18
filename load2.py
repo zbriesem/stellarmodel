@@ -1,6 +1,6 @@
 import numpy as np
-from . import opacity, density
-from scipy.optimize import fminbound
+from . import density
+from scipy.optimize import minimize_scalar
 G = 6.673e-8  # Newton's gravitational constant
 nabla_ad = .4  # Adiabatic temperature gradient
 c = 2.99792458e10  # speed of light
@@ -18,9 +18,7 @@ def surface_vec(m, R, L, ks):
     m    :    total mass of star in g
     R    :    radius of star in cm
     L    :    luminosity of star in erg/s
-    X    :    Hydrogen mass fraction
-    Y    :    Helium mass fraciton
-    Z    :    Metal mass fraction
+    ks   :    opacity table in cm^2/g
 
     Returns:
 
@@ -29,19 +27,18 @@ def surface_vec(m, R, L, ks):
     P    :    pressure at optical depth 2/3 in dyne/cm^2
     T    :    effective temperature of star in K
     """
-    rad = R
-    lum = L
     T = temp_eff(L, R)
 
-    P1 = guess(1.1, T, ks.X, ks.Y, ks.Z, multiplier=2)
-    P2 = guess(1.1e8, T, ks.X, ks.Y, ks.Z, multiplier=1 / 2)
-
-    P = fminbound(residual, P1, P2, args=(m, T, R, ks))
-    return rad, lum, P, T
+    Plower = guess(1.1, T, ks.X, ks.Y, ks.Z, step=2)
+    Pupper = guess(1.1e8, T, ks.X, ks.Y, ks.Z, step=.5)
+    
+    P = minimize_scalar(residual, method='bounded', bounds=[Plower, Pupper], args=(m, T, R, ks))  # faster
+    return R, L, P, T
 
 
 def pressure_surface(m, R, kb):
     """ surface values pressure
+    equation 11.13 in Kippenhahn
 
     Arguments:
 
@@ -59,6 +56,7 @@ def pressure_surface(m, R, kb):
 
 def temp_eff(L, R):
     """ surface values temperature
+    equation 11.14 in Kippenhahn
 
     Arguments:
 
@@ -72,7 +70,7 @@ def temp_eff(L, R):
     return (L / (4 * np.pi * R**2 * sbc))**(1 / 4)
 
 
-def guess(Pguess, T, X, Y, Z, multiplier=3):
+def guess(Pguess, T, X, Y, Z, step=3):
     """ determines extrema of pressure represented on the opacity table
 
     Arguments:
@@ -80,9 +78,9 @@ def guess(Pguess, T, X, Y, Z, multiplier=3):
     Pguess:   underestimation of lowest pressure or overestimation of highest pressure represented on opacity table in dyne/cm^2
     T    :    effective temperature of star in K
     X    :    Hydrogen mass fraction
-    Y    :    Helium mass fraciton
+    Y    :    Helium mass fraction
     Z    :    Metal mass fraction
-    mult :    multiplicative next guess of Pguess
+    step :    multiplicative step for next guess of Pguess
 
     Returns:
 
@@ -97,7 +95,7 @@ def guess(Pguess, T, X, Y, Z, multiplier=3):
         if 3.75 <= log_T <= 8.7 and -8. <= log_R <= 1.:
             ontable = True
         else:
-            Pguess *= multiplier
+            Pguess *= step
     return Pguess
 
 
@@ -110,10 +108,7 @@ def residual(P, m, T, R, ks):
     m    :    total mass of star in g
     T    :    effective temperature of star in K
     R    :    radius of star in cm
-    X    :    Hydrogen mass fraction
-    Y    :    Helium mass fraciton
-    Z    :    Metal mass fraction
-    op   :    opacity table
+    ks   :    opacity table
 
     Returns:
 

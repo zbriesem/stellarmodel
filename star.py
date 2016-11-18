@@ -10,7 +10,7 @@ Ms = 1.9891e33  # mass of sun in g
 class Star:
 
     def __init__(self, comp):
-        """Star object, initally only defined by composition
+        """ Star object, initally only defined by composition
 
         Arguments:
         comp :   X, Y, Z mass fractions, tuple
@@ -38,14 +38,14 @@ class Star:
         self.XCNO = self.ks.XCNO
 
     def set_mass(self, M, fp=.5):
-        """set mass in Ms and fitting point as fraction of M, 0 < fp < M"""
+        """ set mass in Ms and fitting point as fraction of M, 0 < fp < M"""
         self.M = M * Ms
         self.fp = fp * self.M
         self.dm = self.M * 1e-10
         assert(self.fp < self.M, "Your fitting point is outside the star!")
 
     def set_initial(self, *args):
-        """set initial values of R in cm, L in erg/s, Pc in dynes/cm^2, Tc in K, M in Ms
+        """ set initial values of R in cm, L in erg/s, Pc in dynes/cm^2, Tc in K, M in Ms
         *args must be (R, L, Pc, Tc)
         """
         self.R = args[0]
@@ -54,7 +54,7 @@ class Star:
         self.Tc = args[3]
 
     def center(self):
-        """center-out integration
+        """ center-out integration
         """
         self.civec = load1.center_vec(self.Pc, self.Tc, self.dm, self.ks)
         m = [self.dm, self.fp]
@@ -63,7 +63,7 @@ class Star:
         self.cfp = interp1d(self.cxs, self.coutvecs, axis=0)(self.fp)
 
     def surface(self):
-        """surface-in integration
+        """ surface-in integration
         """
         self.sivec = load2.surface_vec(self.M, self.R, self.L, self.ks)
         m = [self.M, self.fp]
@@ -73,7 +73,7 @@ class Star:
         self.sfp = interp1d(self.sxs, self.soutvecs, axis=0)(self.fp)
 
     def return_vec(self):
-        """returns initial conditions necessary to match at fitting point, use after Newton Raphson
+        """ returns initial conditions necessary to match at fitting point, use after Newton Raphson
         """
         return np.array([self.R, self.L, self.Pc, self.Tc])
 

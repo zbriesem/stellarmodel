@@ -6,7 +6,7 @@ from .setup import home_dir
 class OpacityTable:
 
     def __init__(self, X, Y, Z, fname=home_dir() + '/data/OP17.zbriesem@ucsc.edu04112016054844.tab'):
-        """finds the closest composition match to input in OP data file and does a linear interpolation over the opacity table
+        """ finds the closest composition match to input in OP data file and does a linear interpolation over the opacity table
 
         Arguments:
 
@@ -38,7 +38,7 @@ class OpacityTable:
         self.XCNO = self.Z * sum([float(self.lines[ii].strip().split()[3]) for ii in [36, 37, 38]])
 
     def read_summary(self, begin=62, end=188):
-        """read all compositions available in data file"""
+        """ read all compositions available in data file"""
         summary = [self.lines[begin:end][i].strip().split()
                    for i in range(end - begin)]
         Xs = [np.float(summary[i][4].split('=')[-1])
@@ -50,14 +50,14 @@ class OpacityTable:
         self.tables = list(zip(Xs, Ys, Zs))
 
     def match_composition(self):
-        """finds nearest composition to input"""
+        """ finds nearest composition to input"""
         self.read_summary()
         comps = np.asarray(self.tables)
         interpolator = NearestNDInterpolator(comps, range(len(comps)))
         self.ID = interpolator((self.X, self.Y, self.Z))
 
     def get_data(self):
-        """extracts the table associated with composition"""
+        """ extracts the table associated with composition"""
         self.match_composition()
         self.log_R = np.asarray(
             self.lines[self.ID * 77 + 244].strip().split()[1:], dtype=float)
@@ -68,7 +68,7 @@ class OpacityTable:
         self.log_k[self.log_k == 9.999] = np.nan
 
     def Rosseland_mean_opacity(self, rho, T):
-        """linear interpolation over the values of the Rosseland mean opacities at the initialized composition
+        """ linear interpolation over the values of the Rosseland mean opacities at the initialized composition
 
         Arguments:
 

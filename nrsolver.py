@@ -4,7 +4,7 @@ import numpy as np
 class NewtonRaphson:
 
     def __init__(self, Star):
-        """finds Newton Raphson solution for shooting to a fitting point method
+        """ finds Newton Raphson solution for shooting to a fitting point method
 
         Arguments:
         Star    :    Star object, initialized with composition and Star.set_mass(M, fp)
@@ -27,7 +27,7 @@ class NewtonRaphson:
         self.Star.set_initial(*args)
 
     def discrepancy_vec(self):
-        """runs Runge-Kutta from center to fitting point and surface to fitting point
+        """ runs Runge-Kutta from center to fitting point and surface to fitting point
         Returns difference of r, l, P, T at fitting point
         """
         self.Star.center()
@@ -35,7 +35,7 @@ class NewtonRaphson:
         return np.asarray(self.Star.sfp - self.Star.cfp)
 
     def jacobian(self, y0, F0, step=1e-2):
-        """estimates the Jacobian matrix of the discrepancy vector due to small perturbation
+        """ estimates the Jacobian matrix of the discrepancy vector due to small perturbation
 
         Argument:
         y0   :   vector of initial conditions R, L, Pc, Tc, array
@@ -59,7 +59,7 @@ class NewtonRaphson:
         return J
 
     def solve(self, *args):
-        """attempts to find Newton Raphson solution. Output in Star object
+        """ attempts to find Newton Raphson solution. Output in Star object
 
         Arguments:
         args    :   R in cm, L in erg/s, Pc in dyne/cm^2, Tc in K
@@ -73,7 +73,7 @@ class NewtonRaphson:
         y0 = np.asarray(args)
         F0 = self.discrepancy_vec()
         loop = 1
-        while not all(np.abs(F0) < 1e-4 * y0):
+        while not all(np.abs(F0) < 1e-4 * y0):  # make convergence condition robust
             print('Beginning Newton Raphson Iteration', loop)
             J = self.jacobian(y0, F0)
             jinv = np.linalg.inv(J)
@@ -82,5 +82,5 @@ class NewtonRaphson:
             self.set_init(*y0)
             F0 = self.discrepancy_vec()
             loop += 1
-        print('After ', loop - 1, 'iterations of Newton Raphson, the difference vector at the fitting point is', F0)
+        print('After', loop - 1, 'iterations of Newton Raphson, the difference vector at the fitting point is', F0)
 

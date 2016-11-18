@@ -15,8 +15,8 @@ def drdm(r, rho):
 
     Arguments:
 
-    r    :    radius in cm
-    rho  :    density in g/cm^2
+    r    :    radius coordinate in cm
+    rho  :    density coordinate in g/cm^3
 
     Returns:
 
@@ -30,8 +30,8 @@ def dPdm(r, m):
 
     Arguments:
 
-    r    :    radius in cm
-    m    :    mass in g
+    r    :    radius coordinate in cm
+    m    :    mass coordinate in g
 
     Returns:
 
@@ -45,7 +45,7 @@ def dldm(rho, T, X, Y, XCNO):
 
     Arguments:
 
-    rho  :    density in g/cm^2
+    rho  :    density in g/cm^3
     T    :    temperature in K
     X    :    Hydrogen mass fraction
     Y    :    Helium mass fraction
@@ -63,11 +63,11 @@ def dTdm(r, m, T, lum, P, k):
 
     Arguments:
 
-    r    :    radius in cm
-    m    :    mass in g
+    r    :    radius coordinate in cm
+    m    :    mass coordinate in g
     T    :    temperature in K
     lum  :    luminosity in erg/s
-    P    :    pressure in ddyne/cm^2
+    P    :    pressure in dyne/cm^2
     k    :    opacity in cm^2/g
 
     Returns:
@@ -87,7 +87,7 @@ def total_der(m, vals, *args):
 
     Arguments:
 
-    m    :    mass in g
+    m    :    mass coordinate in g
     vals :    input [r, l, P, T]
     args :    first must be opacity
 

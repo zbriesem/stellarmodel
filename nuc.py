@@ -9,7 +9,7 @@ def eppeff(T, rho, X, Y):
     Arguments:
 
     T    :    Temperature in K
-    rho  :    density in g/cm^2
+    rho  :    density in g/cm^3
     X    :    Hydrogen mass fraction
     Y    :    Helium mass fraction
 
@@ -31,9 +31,9 @@ def eCNOeff(T, rho, X, XCNO):
     Arguments:
 
     T    :    Temperature in K
-    rho  :    density in g/cm^2
+    rho  :    density in g/cm^3
     X    :    Hydrogen mass fraction
-    XCNO :    Carbon, nitrogen, oxygen mass fraction
+    XCNO :    Carbon, nitrogen, oxygen mass fraction of Metal mass fraction
 
     Returns:
 

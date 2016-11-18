@@ -1,6 +1,7 @@
 import numpy as np
 
-# from Numerical Recipes Second Edition pg. 717
+# from Numerical Recipes in C Second Edition pg. 717
+# available here: http://www2.units.it/ipl/students_area/imm2/files/Numerical_Recipes.pdf
 a1, a2, a3, a4, a5, a6 = 0., 1 / 5, 3 / 10, 3 / 5, 1., 7 / 8
 b21 = 1 / 5
 b31, b32 = 3 / 40, 9 / 40,
@@ -12,7 +13,7 @@ c1s, c2s, c3s, c4s, c5s, c6s = 2825 / 27648, 0., 18575 / 48384, 13525 / 55296, 2
 
 
 def adaptive_step_control(f, x, y, h0, args=(), n=1e-10):
-    """adaptive step control for Cash-Karp Embedded Runga-Kutta method
+    """ adaptive step control for Cash-Karp Embedded Runga-Kutta method
 
     Arguments:
     f    :    derivative function, from .derivs
@@ -30,7 +31,7 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-10):
 
     x = np.asarray(x)
     y = np.asarray(y)
-    k = np.zeros((6, y.shape[0]), dtype=float)
+    k = np.zeros((6, y.shape[0]), dtype=float)  # equation 16.2.4
 
     k[0] = h0 * f(x + a1 * h0, y, *args)
     k[1] = h0 * f(x + a2 * h0, y + b21 * k[0], *args)
@@ -40,19 +41,19 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-10):
     k[5] = h0 * f(x + a6 * h0, y + b61 * k[0] + b62 * k[1] + b63 * k[2] + b64 * k[3] + b65 * k[4], *args)
 
     ystep = y + (c1 * k[0] + c2 * k[1] + c3 * k[2] + c4 * k[3] + c5 * k[4] + c6 * k[5])
-    delta = (c1 - c1s) * k[0] + (c2 - c2s) * k[1] + (c3 - c3s) * k[2] + (c4 - c4s) * k[3] + (c5 - c5s) * k[4] + (c6 - c6s) * k[5]
+    delta = (c1 - c1s) * k[0] + (c2 - c2s) * k[1] + (c3 - c3s) * k[2] + (c4 - c4s) * k[3] + (c5 - c5s) * k[4] + (c6 - c6s) * k[5]  # equation 16.2.6
 
-    ratio = np.max(np.abs(n * k[0] / delta)**(.2))
+    ratio = np.max(np.abs(n * k[0] / delta)**(.2))  # equation 16.2.7 with euqation 16.2.9
     if not np.isfinite(ratio):
         ratio = 1.1
         print('bad step')
-    h1 = .9 * h0 * ratio
+    h1 = .9 * h0 * ratio  # equation 16.2.7
 
     return ystep, h1
 
 
 def integrate(f, x, y0, h0, args=(), n=1e-10, lim=1000):
-    """integrate derivative along mass coordinates
+    """ integrate derivative along mass coordinates
 
     Arguments:
 

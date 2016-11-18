@@ -8,13 +8,13 @@ kb = 1.3807e-16  # boltzmann constant
 
 
 def density(P, T, X, Y, Z):
-    """density given ideal gas equation of state
+    """ density given ideal gas equation of state
 
     Arguments:
 
     P    :    pressure in dyne/cm^2
     T    :    temperature in K
-    Z    :    Metal mass fraction
+    X    :    Hydrogen mass fraction
     Y    :    Helium mass fraction
     Z    :    Metal mass fraction
 

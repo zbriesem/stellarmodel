@@ -17,13 +17,11 @@ def center_vec(Pc, Tc, m, ks):
     Pc   :    central pressure in dyne/cm^2
     Tc   :    central temperature in K
     m    :    arbitrarily small mass coordinate in g
-    X    :    Hydrogen mass fraction
-    Y    :    Helium mass fraciton
-    Z    :    Metal mass fraction
+    ks   :    opacity table
 
     Returns:
 
-    r    :    radius corresponding to mass coordinate in cm
+    r    :    radius coordinate corresponding to mass coordinate in cm
     L    :    luminosity at mass corrdinate m of star in erg/s
     P    :    pressure at mass corrdinate m in dyne/cm^2
     T    :    temperature at mass corrdinate m of star in K
@@ -44,11 +42,12 @@ def center_vec(Pc, Tc, m, ks):
 
 
 def core_conv(kc, lum, Pc, m, Tc):
-    """evaluates the radiative temperature gradient and compares to the adiabatic temperature gradient
+    """ evaluates the radiative temperature gradient and compares to the adiabatic temperature gradient
+    equation 11.20 in Kippenhahn
 
     Arguments:
 
-    kc   :    central opacity in cm^2/g
+    kc   :    core opacity in cm^2/g
     lum  :    luminosity at mass coordinate m of star in erg/s
     Pc   :    central pressure in dyne/cm^2
     m    :    arbitrarily small mass coordinate in g
@@ -67,6 +66,7 @@ def core_conv(kc, lum, Pc, m, Tc):
 
 def radius_near_center(m, rho):
     """ radius of certain mass coordinate near center
+    equation 11.3 in Kippenhahn
 
     Arguments:
 
@@ -82,6 +82,7 @@ def radius_near_center(m, rho):
 
 def pressure_near_center(m, Pc, rho):
     """ pressure at certain mass coordinate near center
+    equation 11.6 in Kippenhahn
 
     Arguments:
 
@@ -99,6 +100,7 @@ def pressure_near_center(m, Pc, rho):
 
 def temp_near_center(m, Tc, Pc, rho, epsilon, kc=None, coreconv=False):
     """ temperature at certain mass coordinate near center
+    equation 11.9 in Kippenhahn
 
     Arguments:
 
@@ -129,11 +131,12 @@ def temp_near_center(m, Tc, Pc, rho, epsilon, kc=None, coreconv=False):
 
 def lum_near_center(m, epsilon):
     """ luminosity due to nuclear energy generation at certain mass coordinate near center
+    euqation 11.4 in Kippenhahn
 
     Arguments:
 
     m    :    mass coordinate in g
-    epsilon:  nuclear energy generation at central temperature in erg/g/cm^2
+    epsilon:  nuclear energy generation at central temperature in erg/g/s
 
     Returns:
 
