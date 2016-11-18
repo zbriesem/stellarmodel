@@ -68,16 +68,19 @@ class NewtonRaphson:
         Star    :   Star object, updated to convergent initial values
                     Run NewtonRaphson.Star.return_vec() for these values
                     """
+        print('Initializing Star object')
         self.set_init(*args)
         y0 = np.asarray(args)
         F0 = self.discrepancy_vec()
-
-        while not all(np.abs(F0) < 1e-3 * y0):
+        loop = 1
+        while not all(np.abs(F0) < 1e-4 * y0):
+            print('Beginning Newton Raphson Iteration', loop)
             J = self.jacobian(y0, F0)
             jinv = np.linalg.inv(J)
             delV = -np.dot(jinv, F0)
             y0 = y0 + delV
             self.set_init(*y0)
             F0 = self.discrepancy_vec()
+            loop += 1
+        print('After ', loop - 1, 'iterations of Newton Raphson, the difference vector at the fitting point is', F0)
 
-        self.set_init(*y0)

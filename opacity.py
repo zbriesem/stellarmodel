@@ -11,15 +11,15 @@ class OpacityTable:
         Arguments:
 
         X    :    Hydrogen mass fraction
-        Y    :    Helium mass fraciton
+        Y    :    Helium mass fraction
         Z    :    Metal mass fraction
         fname:    location of an OP data file
 
         Instance variables:
 
-        CNOfrac :    Carbon, Nitrogen, Oxygen mass fraciton
+        XCNO :    Carbon, Nitrogen, Oxygen mass fraction
         tables:   all compositions contained in data file
-        ID   :    the table ID in data file which the nearest routine returned to best fit input composition
+        ID   :    the table ID in data file nearest to input composition
         log_R:    log10(rho / T6**3)
         log_T:    log10(T)
         log_k:    log10(k), where k are Rosseland mean opacities in cm^2/g
