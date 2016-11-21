@@ -82,5 +82,7 @@ class NewtonRaphson:
             self.set_init(*y0)
             F0 = self.discrepancy_vec()
             loop += 1
+
+        self.Star.profiles()
         print('After', loop - 1, 'iterations of Newton Raphson, the difference vector at the fitting point is', F0)
 

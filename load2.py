@@ -28,12 +28,13 @@ def surface_vec(m, R, L, ks):
     T    :    effective temperature of star in K
     """
     T = temp_eff(L, R)
-
-    Plower = guess(1.1, T, ks.X, ks.Y, ks.Z, step=2)
-    Pupper = guess(1.1e8, T, ks.X, ks.Y, ks.Z, step=.5)
+    X, Y, Z = ks.X, ks.Y, ks.Z
+    Plower = guess(1.1, T, X, Y, Z, step=2)
+    Pupper = guess(1.1e8, T, X, Y, Z, step=.5)
     
+    # taken from Numerical Recipes in C Second Edition. Chapter 10
     P = minimize_scalar(residual, method='bounded', bounds=[Plower, Pupper], args=(m, T, R, ks))  # faster
-    return R, L, P, T
+    return R, L, P.x, T
 
 
 def pressure_surface(m, R, kb):
