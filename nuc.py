@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import LinearNDInterpolator, interp1d
-from scipy.ndimage import gaussian_filter1d
+from scipy.ndimage import gaussian_filter
 
 
 def eppeff(T, rho, X, Y):
@@ -59,15 +59,15 @@ def psi(T, Y):
     T = np.asarray(T)
     T7 = T / 1e7
     Yvals = [.1, .5, .9]
-    T7vals = np.arange(.75, 3.5, .25)
-    Psivals = np.array([[1., 1., 1.03, 1.05, 1.15, 1.25, 1.36, 1.4, 1.42, 1.43, 1.43], [1., 1.03, 1.1, 1.36, 1.67,1.78, 1.65, 1.58, 1.50, 1.44, 1.43], [1., 1.17, 1.63, 1.84, 1.94, 1.93, 1.8, 1.69, 1.58, 1.5, 1.43]])
+    T7vals = np.arange(.25, 3.75, .25)
+    Psivals = np.array([[1.,1.,1., 1., 1.03, 1.05, 1.15, 1.25, 1.36, 1.4, 1.42, 1.43, 1.43,1.43], [1.,1.,1., 1.03, 1.1, 1.36, 1.67,1.78, 1.65, 1.58, 1.50, 1.44, 1.43,1.43], [1.,1.,1., 1.17, 1.63, 1.84, 1.94, 1.93, 1.8, 1.69, 1.58, 1.5, 1.43,1.43]])
     Ygrid, T7grid = np.meshgrid(Yvals, T7vals)
 
     f = LinearNDInterpolator(
         (Ygrid.flatten(), T7grid.flatten()), Psivals.T.flatten())
-    g = gaussian_filter1d(f(Y, T7vals), 1)
+    g = gaussian_filter(f(Y, T7vals), .25, mode='nearest')
     h = interp1d(T7vals, g)
 
-    Ts = T7.clip(.75, 3.25)
+    Ts = T7.clip(.5, 3.5)
 
-    return np.round(h(Ts), 2)
+    return h(Ts)

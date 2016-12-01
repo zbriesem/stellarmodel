@@ -42,13 +42,18 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
 
     ystep = y + (c1 * k[0] + c2 * k[1] + c3 * k[2] + c4 * k[3] + c5 * k[4] + c6 * k[5])
     delta = (c1 - c1s) * k[0] + (c2 - c2s) * k[1] + (c3 - c3s) * k[2] + (c4 - c4s) * k[3] + (c5 - c5s) * k[4] + (c6 - c6s) * k[5]  # equation 16.2.6
-
-    ratio = np.max(np.abs(n * k[0] / delta)**(.2))  # equation 16.2.7 with equation 16.2.9
+    S = .9
+    if np.max(np.abs(n * k[0] / delta)) >= 1.:
+        ratio = np.max(np.abs(n * k[0] / delta)**(.2))  # equation 16.2.7 with equation 16.2.9
+    else:
+        ratio = np.max(np.abs(n * k[0] / delta)**(.25))
     if not np.isfinite(ratio):
-        ratio = 1.1
+        ratio = 1 / S
         print('bad step')
-    h1 = .3 * h0 * ratio  # equation 16.2.7
-
+    if S * ratio > 1.18:
+        #print(.9 * ratio)
+        ratio = 1.18 / S
+    h1 = S * h0 * ratio  # equation 16.2.7
     return ystep, h1
 
 
@@ -67,8 +72,8 @@ def integrate(f, x, y0, h0, args=(), n=1e-8, lim=10000):
 
     Returns:
 
-    y    :    vector evaluated at each hs
-    hs   :    adaptive step sizes
+    y    :    vector evaluated at each xs
+    xs   :    mass coordinates in g for adaptive step sizes
     """
     hc = h0; xc = x[0]; xn = xc; yc = y0
     xs, ys, hs = [], [], []

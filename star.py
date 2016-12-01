@@ -78,8 +78,8 @@ class Star:
         return np.array([self.R, self.L, self.Pc, self.Tc])
 
     def profiles(self):
-        self.xs = np.hstack((self.cxs, self.sxs[::-1]))
-        self.outvecs = np.vstack((np.asarray(self.coutvecs), np.asarray(self.soutvecs)[::-1]))
+        self.xs = np.hstack((self.cxs[:-1], self.sxs[::-1][1:]))
+        self.outvecs = np.vstack((np.asarray(self.coutvecs)[:-1], np.asarray(self.soutvecs)[::-1][1:]))
 
 
 

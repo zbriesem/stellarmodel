@@ -1,4 +1,5 @@
 import numpy as np
+from time import time
 
 
 class NewtonRaphson:
@@ -20,16 +21,25 @@ class NewtonRaphson:
         self.Star = Star
         if self.Star.M is None:
             print('You must run NewtonRaphson.Star.set_mass(M, fp) to assign a mass and fitting point!')
+        self.n = 1e-4
 
     def set_init(self, *args):
-        """passes initial R, L, Pc, Tc vector to Star object
+        """ passes initial R, L, Pc, Tc vector to Star object
         """
         self.Star.set_initial(*args)
+
+    def set_convergence(self, n):
+        """ set convergence condition parameter, float
+        decrease parameter for better convergence, but also lasts way longer"""
+        self.n = n
+        if self.n < 1e-4:
+            print('This will take much longer to converge')
 
     def discrepancy_vec(self):
         """ runs Runge-Kutta from center to fitting point and surface to fitting point
         Returns difference of r, l, P, T at fitting point
         """
+
         self.Star.center()
         self.Star.surface()
         return np.asarray(self.Star.sfp - self.Star.cfp)
@@ -68,13 +78,15 @@ class NewtonRaphson:
         Star    :   Star object, updated to convergent initial values
                     Run NewtonRaphson.Star.return_vec() for these values
                     """
+        t1 = time()
         print('Initializing Star object')
         self.set_init(*args)
         y0 = np.asarray(args)
         F0 = self.discrepancy_vec()
         loop = 1
-        while not all(np.abs(F0) < 1e-4 * y0):  # make convergence condition robust
+        while not all(np.abs(F0) < self.n * y0):  # make convergence condition robust
             print('Beginning Newton Raphson Iteration', loop)
+            print(y0)
             J = self.jacobian(y0, F0)
             jinv = np.linalg.inv(J)
             delV = -np.dot(jinv, F0)
@@ -84,5 +96,5 @@ class NewtonRaphson:
             loop += 1
 
         self.Star.profiles()
-        print('After', loop - 1, 'iterations of Newton Raphson, the difference vector at the fitting point is', F0)
+        print('After', loop - 1, 'iterations of Newton Raphson, the maximum fractional difference at the fitting point is %.4g' % np.max(np.abs((F0 / y0))), 'in', time() - t1, 'seconds')
 
