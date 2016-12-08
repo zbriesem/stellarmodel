@@ -30,7 +30,6 @@ def center_vec(Pc, Tc, m, ks):
 
     epsilon = nuc.eppeff(Tc, rhoc, ks.X, ks.Y) + nuc.eCNOeff(Tc, rhoc, ks.X, ks.XCNO)
     lum = lum_near_center(m, epsilon)
-
     kc = ks.Rosseland_mean_opacity(rhoc, Tc)
     P = pressure_near_center(m, Pc, rhoc)
 

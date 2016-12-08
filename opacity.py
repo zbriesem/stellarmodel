@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.interpolate import NearestNDInterpolator, LinearNDInterpolator
+from scipy.interpolate import NearestNDInterpolator, RectBivariateSpline
 from .setup import home_dir
 
 
@@ -30,10 +30,10 @@ class OpacityTable:
         """
         with open(fname, 'r') as file:
             self.lines = file.readlines()
-        self.X = X
-        self.Y = Y
-        self.Z = Z
-        assert(self.X + self.Y + self.Z == 1, "Mass fractions don't add to unity!")
+        self.Xi = X
+        self.Yi = Y
+        self.Zi = Z
+        assert(self.Xi + self.Yi + self.Zi == 1, "Mass fractions don't add to unity!")
         self.get_data()
         self.XCNO = self.Z * sum([float(self.lines[ii].strip().split()[3]) for ii in [36, 37, 38]])
 
@@ -54,21 +54,32 @@ class OpacityTable:
         self.read_summary()
         comps = np.asarray(self.tables)
         interpolator = NearestNDInterpolator(comps, range(len(comps)))
-        self.ID = interpolator((self.X, self.Y, self.Z))
+        self.ID = interpolator((self.Xi, self.Yi, self.Zi))
+
+    def release_comp(self):
+        self.match_composition()
+        self.X, self.Y, self.Z = self.tables[self.ID]
 
     def get_data(self):
         """ extracts the table associated with composition"""
-        self.match_composition()
+        self.release_comp()
         self.log_R = np.asarray(
             self.lines[self.ID * 77 + 244].strip().split()[1:], dtype=float)
         self.log_k = np.asarray([self.lines[246 + self.ID * 77:316 + self.ID * 77][
                                 i].strip().split()[1:] for i in range(70)], dtype=float)
         self.log_T = np.asarray([self.lines[246 + self.ID * 77:316 + self.ID * 77][
                                 i].strip().split()[0] for i in range(70)], dtype=float)
-        self.log_k[self.log_k == 9.999] = np.nan
+        c = ~(self.log_k == 9.999).any(axis=1)
+        self.log_k = self.log_k[c]
+        self.log_T = self.log_T[c]
+
+        op = 10**self.log_k
+        Ts = 10**self.log_T
+        Rs = 10**self.log_R
+        self.interpolator = RectBivariateSpline(Ts, Rs, op, kx=1, ky=1)
 
     def Rosseland_mean_opacity(self, rho, T):
-        """ linear interpolation over the values of the Rosseland mean opacities at the initialized composition
+        """ spline interpolation over the values of the Rosseland mean opacities at the nearest composition
 
         Arguments:
 
@@ -80,9 +91,5 @@ class OpacityTable:
         k    :    Rosseland mean opacity in cm^2/g"""
         T6 = T / 1e6
         R = rho / T6**3
-        k = 10**self.log_k
 
-        grid_R, grid_T = np.meshgrid(10**self.log_R, 10**self.log_T)
-        interpolator = LinearNDInterpolator((grid_R.flatten(), grid_T.flatten()), k.flatten())
-
-        return interpolator(R, T)
+        return float(self.interpolator(T, R))

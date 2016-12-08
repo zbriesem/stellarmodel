@@ -1,6 +1,5 @@
 import numpy as np
-from scipy.interpolate import LinearNDInterpolator, interp1d
-from scipy.ndimage import gaussian_filter
+from scipy.interpolate import RectBivariateSpline
 
 
 def eppeff(T, rho, X, Y):
@@ -44,8 +43,15 @@ def eCNOeff(T, rho, X, XCNO):
     return 8.24e25 * g141 * rho * X * XCNO / T9**(2 / 3) * np.exp(-15.231 / T9**(1 / 3) - (T9 / .8)**2)
 
 
+Yvals = [.1, .5, .9]
+T7vals = np.arange(.25, 3.75, .25)
+Psivals = np.array([[1., 1., 1., 1., 1.03, 1.05, 1.15, 1.25, 1.36, 1.4, 1.42, 1.43, 1.43, 1.43], [1., 1., 1., 1.03, 1.1, 1.36, 1.67, 1.78, 1.65, 1.58, 1.50, 1.44, 1.43, 1.43], [1., 1., 1., 1.17, 1.63, 1.84, 1.94, 1.93, 1.8, 1.69, 1.58, 1.5, 1.43, 1.43]])
+Ygrid, T7grid = np.meshgrid(Yvals, T7vals)
+f = RectBivariateSpline(Yvals, T7vals, Psivals, kx=1, ky=1)
+
+
 def psi(T, Y):
-    """ linear interpolation to correct for the transition between pp1 and pp3, with minor cheat to make uniformly negative second derivative
+    """ linear interpolation to correct for the transition between pp1 and pp3
 
     Arguments:
 
@@ -58,16 +64,5 @@ def psi(T, Y):
     """
     T = np.asarray(T)
     T7 = T / 1e7
-    Yvals = [.1, .5, .9]
-    T7vals = np.arange(.25, 3.75, .25)
-    Psivals = np.array([[1.,1.,1., 1., 1.03, 1.05, 1.15, 1.25, 1.36, 1.4, 1.42, 1.43, 1.43,1.43], [1.,1.,1., 1.03, 1.1, 1.36, 1.67,1.78, 1.65, 1.58, 1.50, 1.44, 1.43,1.43], [1.,1.,1., 1.17, 1.63, 1.84, 1.94, 1.93, 1.8, 1.69, 1.58, 1.5, 1.43,1.43]])
-    Ygrid, T7grid = np.meshgrid(Yvals, T7vals)
 
-    f = LinearNDInterpolator(
-        (Ygrid.flatten(), T7grid.flatten()), Psivals.T.flatten())
-    g = gaussian_filter(f(Y, T7vals), .25, mode='nearest')
-    h = interp1d(T7vals, g)
-
-    Ts = T7.clip(.5, 3.5)
-
-    return h(Ts)
+    return f.ev(Y, T7)

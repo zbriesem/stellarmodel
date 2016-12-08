@@ -1,4 +1,4 @@
-from . import opacity, derivs, load1, load2, integration
+from . import opacity, derivs, load1, load2, integration, density
 from scipy.interpolate import interp1d
 import numpy as np
 
@@ -13,7 +13,8 @@ class Star:
         """ Star object, initally only defined by composition
 
         Arguments:
-        comp :   X, Y, Z mass fractions, tuple
+        comp :   input X, Y, Z mass fractions, tuple
+                 if not explicitly in opacity table, all compositions will be changed to nearest represented composition
 
         Instance variables:
         ks   :   opacity table defined by composition
@@ -33,9 +34,10 @@ class Star:
         surface: integrate inward from surface to fitting point
         return_vec: returns initial conditions necessary to match at fitting point, use after Newton Raphson
         """
-        self.X, self.Y, self.Z = comp
-        self.ks = opacity.OpacityTable(self.X, self.Y, self.Z)
+        self.ks = opacity.OpacityTable(*comp)
+        self.X, self.Y, self.Z = self.ks.X, self.ks.Y, self.ks.Z
         self.XCNO = self.ks.XCNO
+        self.n = 1e-13
 
     def set_mass(self, M, fp=.5):
         """ set mass in Ms and fitting point as fraction of M, 0 < fp < M"""
@@ -53,13 +55,18 @@ class Star:
         self.Pc = args[2]
         self.Tc = args[3]
 
+    def set_tol(self, n):
+        """ set integration tolerance parameter
+        """
+        self.n = n
+
     def center(self):
         """ center-out integration
         """
         self.civec = load1.center_vec(self.Pc, self.Tc, self.dm, self.ks)
         m = [self.dm, self.fp]
 
-        self.coutvecs, self.cxs = integration.integrate(derivs.total_der, m, self.civec, self.dm, args=(self.ks,))
+        self.coutvecs, self.cxs = integration.integrate(derivs.total_der, m, self.civec, self.dm, args=(self.ks,), n=self.n)
         self.cfp = interp1d(self.cxs, self.coutvecs, axis=0)(self.fp)
 
     def surface(self):
@@ -68,7 +75,7 @@ class Star:
         self.sivec = load2.surface_vec(self.M, self.R, self.L, self.ks)
         m = [self.M, self.fp]
 
-        self.soutvecs, self.sxs = integration.integrate(derivs.total_der, m, self.sivec, -1. * self.dm, args=(self.ks,))
+        self.soutvecs, self.sxs = integration.integrate(derivs.total_der, m, self.sivec, -1. * self.dm, args=(self.ks,), n=self.n)
 
         self.sfp = interp1d(self.sxs, self.soutvecs, axis=0)(self.fp)
 
@@ -78,8 +85,24 @@ class Star:
         return np.array([self.R, self.L, self.Pc, self.Tc])
 
     def profiles(self):
-        self.xs = np.hstack((self.cxs[:-1], self.sxs[::-1][1:]))
-        self.outvecs = np.vstack((np.asarray(self.coutvecs)[:-1], np.asarray(self.soutvecs)[::-1][1:]))
+        """ stages profiles in self.outvecs, as well as density, opacity and temperature gradient
+        """
+        self.xs = np.hstack((self.cxs[:-1], self.fp, self.sxs[::-1][1:]))
+        self.outvecs = np.vstack((np.asarray(self.coutvecs)[:-1], (self.cfp + self.sfp) / 2, np.asarray(self.soutvecs)[::-1][1:]))
+        self.den = density.density(self.outvecs[:, 2], self.outvecs[:, 3], self.X, self.Y, self.Z)
+
+        ops = []
+        for i in range(len(self.outvecs)):
+            ops.append(self.ks.Rosseland_mean_opacity(self.den[i], self.outvecs[i, 3]))
+        self.ops = np.asarray(ops)
+
+        nablas = []
+        for i in range(0, len(self.xs) - 1):
+            one = np.log(self.outvecs[i + 1, 3]) - np.log(self.outvecs[i, 3])
+            two = np.log(self.outvecs[i + 1, 2]) - np.log(self.outvecs[i, 2])
+            nablas.append(one / two)
+        nablas.append(np.nan)
+        self.nabla = np.asarray(nablas)
 
 
 

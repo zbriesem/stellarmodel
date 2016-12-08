@@ -21,7 +21,7 @@ class NewtonRaphson:
         self.Star = Star
         if self.Star.M is None:
             print('You must run NewtonRaphson.Star.set_mass(M, fp) to assign a mass and fitting point!')
-        self.n = 1e-4
+        self.n = 1e-6
 
     def set_init(self, *args):
         """ passes initial R, L, Pc, Tc vector to Star object
@@ -32,7 +32,7 @@ class NewtonRaphson:
         """ set convergence condition parameter, float
         decrease parameter for better convergence, but also lasts way longer"""
         self.n = n
-        if self.n < 1e-4:
+        if self.n < 1e-6:
             print('This will take much longer to converge')
 
     def discrepancy_vec(self):

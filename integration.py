@@ -12,7 +12,7 @@ c1, c2, c3, c4, c5, c6 = 37 / 378, 0., 250 / 621, 125 / 594, 0., 512 / 1771
 c1s, c2s, c3s, c4s, c5s, c6s = 2825 / 27648, 0., 18575 / 48384, 13525 / 55296, 277 / 14336, 1 / 4
 
 
-def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
+def adaptive_step_control(f, x, y, h0, args=(), n=1e-13):
     """ adaptive step control for Cash-Karp Embedded Runga-Kutta method
 
     Arguments:
@@ -50,14 +50,11 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-8):
     if not np.isfinite(ratio):
         ratio = 1 / S
         print('bad step')
-    if S * ratio > 1.18:
-        #print(.9 * ratio)
-        ratio = 1.18 / S
     h1 = S * h0 * ratio  # equation 16.2.7
     return ystep, h1
 
 
-def integrate(f, x, y0, h0, args=(), n=1e-8, lim=10000):
+def integrate(f, x, y0, h0, args=(), n=1e-13, lim=1e6):
     """ integrate derivative along mass coordinates
 
     Arguments:
