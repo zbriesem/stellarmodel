@@ -12,7 +12,7 @@ c1, c2, c3, c4, c5, c6 = 37 / 378, 0., 250 / 621, 125 / 594, 0., 512 / 1771
 c1s, c2s, c3s, c4s, c5s, c6s = 2825 / 27648, 0., 18575 / 48384, 13525 / 55296, 277 / 14336, 1 / 4
 
 
-def adaptive_step_control(f, x, y, h0, args=(), n=1e-13):
+def adaptive_step_control(f, x, y, h0, args=(), n=1e-14):
     """ adaptive step control for Cash-Karp Embedded Runga-Kutta method
 
     Arguments:
@@ -54,7 +54,7 @@ def adaptive_step_control(f, x, y, h0, args=(), n=1e-13):
     return ystep, h1
 
 
-def integrate(f, x, y0, h0, args=(), n=1e-13, lim=1e6):
+def integrate(f, x, y0, h0, args=(), n=1e-14, lim=1e6):
     """ integrate derivative along mass coordinates
 
     Arguments:

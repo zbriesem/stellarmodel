@@ -37,7 +37,7 @@ class Star:
         self.ks = opacity.OpacityTable(*comp)
         self.X, self.Y, self.Z = self.ks.X, self.ks.Y, self.ks.Z
         self.XCNO = self.ks.XCNO
-        self.n = 1e-13
+        self.n = 1e-14
 
     def set_mass(self, M, fp=.5):
         """ set mass in Ms and fitting point as fraction of M, 0 < fp < M"""
